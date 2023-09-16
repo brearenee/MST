@@ -53,4 +53,7 @@ java DemoMain
  * 
  */
 
-//One list for each node. 
+//One list for each node.
+
+javac CommandLineInputExample.java
+java CommandLineInputExample argument1
