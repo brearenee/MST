@@ -11,22 +11,23 @@ public class Mst {
     private List<Edge> graphEdges;
     private final List<List<Edge>> adjacencyList = new ArrayList<>();
     private List<Edge> sortedEdges = new ArrayList<>();
+    private List<Edge> visitedEdges = new ArrayList<>();
 
     public static void main(String[] args) {
         List<List<Edge>> mstList;
         Mst mst;
 
-        if (args.length==1){
-           mst = new Mst(args[0]);
-        }
-        else{
+        if (args.length == 1) {
+            mst = new Mst(args[0]);
+        } else {
             mst = new Mst(DEF_FILE_NAME);
         }
         mstList = mst.getMST();
         printAdjList(mstList);
-       // System.out.println(getTotalCost(mstList));
+        // System.out.println(getTotalCost(mstList));
 
     }
+
     public Mst(String filename) {
         dataFileName = filename;
     }
@@ -38,51 +39,49 @@ public class Mst {
     private List<List<Edge>> getMST() {
         int i = 0;
         graphEdges = File2Edges.getEdgesFromFile(dataFileName);
-        setUpAdjList();
-        int size = graphEdges.size();
         getSortedEdges(graphEdges);
-        for (Edge edge : sortedEdges){
-            System.out.println(edge.toString());
-        }
+        setUpAdjList();
 
-        /*
-        while (i < size) {
-            Edge smallestEdge = findSmallestEdge();
-            if (!isEdgeInAjList(smallestEdge, adjacencyList)){
-                addToAdjacencyList(smallestEdge);
-            }
-            i++;*/
-       // List<Edge> testList = new ArrayList<>();
-        //testList.add(graphEdges.get(0));
+        int size = graphEdges.size();
+        System.out.println("new sorted list ");
+        for (Edge edge : sortedEdges) {
+            System.out.println(edge.toString());
+            System.out.println(isEdgeInAjList(edge));
+        }
+        System.out.println("adjacency list with reverse stuff  ");
+
+
         return adjacencyList;
     }
+
     //takes in GraphEdges and adds each node to the ADJ list.  Since the graph is unweighted, both orders are added.
-    private void setUpAdjList () {
+    private void setUpAdjList() {
         List<Edge> tempList;
+        List<Edge> reverseList;
         Edge reverseEdge;
-        for (Edge edge : graphEdges) {
+        for (Edge edge : sortedEdges) {
             tempList = new ArrayList<>();
             tempList.add(edge);
             adjacencyList.add(tempList);
-            tempList.remove(edge);
 
-            //add in it's reverse. treeset so duplicates will not be added.
-            reverseEdge = new Edge( edge.end(), edge.start(), edge.weight());
-            tempList.add(reverseEdge);
-            adjacencyList.add(tempList);
-
-
+            //add reverse edge to adjacency list because of unweighted graph
+            reverseList = new ArrayList<>();
+            reverseEdge = new Edge(edge.end(), edge.start(), edge.weight());
+            reverseList.add(reverseEdge);
+            adjacencyList.add(reverseList);
         }
     }
 
-    private void getSortedEdges (List<Edge> unsortedList){
+    private void getSortedEdges(List<Edge> unsortedList) {
         int i = 0;
-        while (i< graphEdges.size()){
+        while (i < graphEdges.size()) {
             Edge smallestEdge = findSmallestEdge();
             sortedEdges.add(smallestEdge);
-            }
-            i++;
         }
+        i++;
+    }
+
+
     private Edge findSmallestEdge() {
         Edge smallest = graphEdges.get(0);
         for (Edge edge : graphEdges) {
@@ -103,7 +102,7 @@ public class Mst {
         }
     }
 
-    /*
+
     private boolean addToAdjacencyList(Edge smallestEdge) {
         List<Edge> list = new ArrayList<>();
         int count = 0;
@@ -129,16 +128,12 @@ public class Mst {
 
 
 
-    private boolean isEdgeInAjList(Edge edge, List<List<Edge>> adjacenyList) {
-        int start = 0;
-        int end = 0;
-
-
-        for (List<Edge> listEdge : adjacenyList) {
-            for (Edge node : listEdge) {
-                if (node.start().equals(edge.start())) start++;
-                if (node.end().equals(edge.end())) end++;
-                if (start > 0 && end > 0) return true;
+    private boolean isEdgeInAjList(Edge edge ) {
+        Edge reverseEdge = new Edge(edge.end(), edge.start(), edge.weight());
+        Boolean counter=false;
+        for (Edge node : visitedEdges) {
+            if (node.equals(edge) || node.equals(reverseEdge)) {
+                return true;
             }
         }
         return false;
@@ -154,6 +149,6 @@ public class Mst {
         return sum;
     }
 
-         */
+
 }
 
