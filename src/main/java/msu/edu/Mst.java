@@ -45,7 +45,6 @@ public class Mst {
             }
             i++;
         }
-
         printAdjList(adjacencyList);
     }
 
