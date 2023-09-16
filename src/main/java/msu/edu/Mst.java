@@ -35,7 +35,6 @@ public class Mst {
         int i = 0;
         graphEdges = File2Edges.getEdgesFromFile(dataFileName);
         int size = graphEdges.size();
-
         while (i < size) {
             Edge smallestEdge = findSmallestEdge();
             System.out.println(smallestEdge.toString());
