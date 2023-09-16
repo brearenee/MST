@@ -141,15 +141,15 @@ public class Mst{
     }
 
     public String listListtoString (List<List<Edge>> list) {
-        String innerList="";
-        String fullList="";
+        StringBuilder innerList= new StringBuilder();
+        StringBuilder fullList= new StringBuilder();
         for (List<Edge> edgeList : list) {
             for (Edge edge : edgeList){
-                innerList += edge.toString();
+                innerList.append(edge.toString());
             }
-            fullList += ":" + innerList;
+            fullList.append(":").append(innerList);
         }
-        return fullList;
+        return fullList.toString();
     }
 
     public String listToString(List<Edge> list){
