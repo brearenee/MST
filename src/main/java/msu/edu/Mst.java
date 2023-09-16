@@ -32,40 +32,45 @@ public class Mst{
 
 
     private void wrapperFunction(String filename){
-        int i=1;
+        int i=0;
         graphEdges = File2Edges.getEdgesFromFile(dataFileName);
+        //seeding my adjacency matrix for testing purposes
+        Edge edge1 = new Edge("House E","House I", 2);
+        Edge edge2 = new Edge("House J","House G", 2);
+        Edge edge3 = new Edge("x","y", 300);
+        Edge edge4 = new Edge("x","y", 400);
+        Edge edge5 = new Edge("x","y", 500);
+        List<Edge> listEdges= new ArrayList<>() ;
+        listEdges.add(edge1);
+        listEdges.add(edge2);
+        List<Edge> listEdges2 = new ArrayList<>();
+        listEdges2.add(edge3);
+        listEdges2.add(edge4);
+        listEdges2.add(edge5);
+        adjacencyList.add(listEdges);
+        adjacencyList.add(listEdges2);
+
         int size = graphEdges.size();
 
+        System.out.println("");
+        System.out.println("Order of Smallest Edges");
         while (i < size){
-            System.out.println("the smallest edge is: ");
             Edge smallestEdge = findSmallestEdge();
             System.out.println(smallestEdge.toString());
-
-
-            //test if that edge is in the adjacency list
-            System.out.println("is this edge in the Adjacency Matrix?:");
-            Boolean inAdjList =areEdgesinAjList(smallestEdge, adjacencyList);
-            System.out.println(inAdjList);
-
-            if (inAdjList == false){
-                addToAdjacencyList(smallestEdge, adjacencyList);
-            }
+        //is this smallest Edge in the adjacenyMatrix?
+            System.out.println(isEdgeinAjList(smallestEdge,adjacencyList));
             i++;
         }
 
+        System.out.println("Final graph List");
+        String list = listToString(graphEdges);
+        System.out.println(list);
 
 
-        System.out.println("this is new adjacenyList ");
-        for(List<Edge> edgeList : adjacencyList){
-            for (Edge edge : edgeList){
-                System.out.print(edge.toString() + "  ");
-
-            }
-            System.out.println(" ");
-
-        }
 
 
+        String adjList = listListtoString(adjacencyList);
+        System.out.println(adjList);
     }
 
     public static void printAdjacenyList( List<List<Edge>> AjList){
@@ -89,15 +94,11 @@ public class Mst{
         }
 
         for( List<Edge> innerList : adjacencyList){
-            System.out.println(0001);
             if (innerList.get(count).start() == smallestEdge.start()) {
-                System.out.println("1");
                 list = adjacencyList.get(count);
                 System.out.println(list);
                 list.add(smallestEdge);
-                System.out.println("3");
                 adjacencyList.remove(count);
-                System.out.println("4");
                 adjacencyList.add(list);
                 count++;
                 break;
@@ -124,26 +125,38 @@ public class Mst{
 
     }
 
-    private boolean areEdgesinAjList ( Edge edge, List<List<Edge>> AdjacenyList ){
-        String node1 = edge.start();
-        String node2 = edge.end();
-        boolean counter1 = false;
-        boolean counter2 = false;
+    private boolean isEdgeinAjList ( Edge edge, List<List<Edge>> AdjacenyList ){
+        int start = 0;
+        int end = 0;
 
-        if (AdjacenyList.isEmpty()) return false;
-        for ( List<Edge> list : AdjacenyList) {
-            for (Edge listEdge : list ){
-                if (listEdge.start() == node1 || listEdge.start() == node2){
-                    counter1 = true;
-                }
-                if (listEdge.end() == node1 || listEdge.end() == node2){
-                    counter2 = true;
-                }
-            }
-            if (counter1 !=true && counter2 != true ){
-                return false;
+
+        for( List<Edge> listEdge : AdjacenyList ){
+            for (Edge node : listEdge){
+                if (node.start().equals(edge.start())) start++;
+                if (node.end().equals(edge.end())) end++;
+                if (start > 0 && end > 0) return true;
             }
         }
-        return true;
+        return false;
+    }
+
+    public String listListtoString (List<List<Edge>> list) {
+        String innerList="";
+        String fullList="";
+        for (List<Edge> edgeList : list) {
+            for (Edge edge : edgeList){
+                innerList += edge.toString();
+            }
+            fullList += ":" + innerList;
+        }
+        return fullList;
+    }
+
+    public String listToString(List<Edge> list){
+        String stringList ="";
+        for ( Edge edge : list ) {
+            stringList = stringList + edge.toString() + "/n";
+        }
+        return stringList;
     }
 }
