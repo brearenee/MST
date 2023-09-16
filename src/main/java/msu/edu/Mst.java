@@ -1,33 +1,27 @@
 package msu.edu;
 import msu.edu.graphinput.*;
 import java.util.List;
-import java.util.LinkedList;
-import java.io.File;
-import java.io.IOException;
-import java.io.FileWriter;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.ArrayList;
 
 
 public class Mst {
     static final String DEF_FILE_NAME = "town.txt";
-    private String dataFileName;
+    private final String dataFileName;
     private List<Edge> graphEdges;
-    private List<List<Edge>> adjacencyList = new ArrayList<>();
+    private final List<List<Edge>> adjacencyList = new ArrayList<>();
 
     public static void main(String[] args) {
-        List<List<Edge>> mstList = new ArrayList<>();
-        Mst mst = new Mst();
-        mst.getMST(DEF_FILE_NAME);
+        List<List<Edge>> mstList;
+        Mst mst;
 
         if (args.length==1){
-            mstList = mst.getMST(args[0]);
+           mst = new Mst(args[0]);
         }
         else{
-            mstList = mst.getMST(DEF_FILE_NAME);
-        }
+            mst = new Mst(DEF_FILE_NAME);
 
+        }
+        mstList = mst.getMST();
         printAdjList(mstList);
 
     }
@@ -42,14 +36,14 @@ public class Mst {
     }
 
 
-    private List<List<Edge>> getMST(String filename) {
+    private List<List<Edge>> getMST() {
         int i = 0;
         graphEdges = File2Edges.getEdgesFromFile(dataFileName);
         int size = graphEdges.size();
         while (i < size) {
             Edge smallestEdge = findSmallestEdge();
-            if (!isEdgeinAjList(smallestEdge, adjacencyList)){
-                addToAdjacencyList(smallestEdge, adjacencyList);
+            if (!isEdgeInAjList(smallestEdge, adjacencyList)){
+                addToAdjacencyList(smallestEdge);
             }
             i++;
         }
@@ -64,7 +58,7 @@ public class Mst {
         }
     }
 
-    private boolean addToAdjacencyList(Edge smallestEdge, List<List<Edge>> adjList) {
+    private boolean addToAdjacencyList(Edge smallestEdge) {
         List<Edge> list = new ArrayList<>();
         int count = 0;
 
@@ -99,7 +93,7 @@ public class Mst {
 
     }
 
-    private boolean isEdgeinAjList(Edge edge, List<List<Edge>> AdjacenyList) {
+    private boolean isEdgeInAjList(Edge edge, List<List<Edge>> AdjacenyList) {
         int start = 0;
         int end = 0;
 
