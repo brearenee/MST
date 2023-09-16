@@ -17,8 +17,19 @@ public class Mst {
     private List<List<Edge>> adjacencyList = new ArrayList<>();
 
     public static void main(String[] args) {
+        List<List<Edge>> mstList = new ArrayList<>();
         Mst mst = new Mst();
-        mst.getAdjacenyMatrix(DEF_FILE_NAME);
+        mst.getMST(DEF_FILE_NAME);
+
+        if (args.length==1){
+            mstList = mst.getMST(args[0]);
+        }
+        else{
+            mstList = mst.getMST(DEF_FILE_NAME);
+        }
+
+        printAdjList(mstList);
+
     }
 
     public Mst(String filename) {
@@ -31,20 +42,18 @@ public class Mst {
     }
 
 
-    private void getAdjacenyMatrix(String filename) {
+    private List<List<Edge>> getMST(String filename) {
         int i = 0;
         graphEdges = File2Edges.getEdgesFromFile(dataFileName);
         int size = graphEdges.size();
         while (i < size) {
             Edge smallestEdge = findSmallestEdge();
-            System.out.println(smallestEdge.toString());
-            System.out.println(isEdgeinAjList(smallestEdge, adjacencyList));
             if (!isEdgeinAjList(smallestEdge, adjacencyList)){
                 addToAdjacencyList(smallestEdge, adjacencyList);
             }
             i++;
         }
-        printAdjList(adjacencyList);
+        return adjacencyList;
     }
 
     public static void printAdjList(List<List<Edge>> AjList) {
