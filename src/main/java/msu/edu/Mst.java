@@ -34,7 +34,7 @@ public class Mst{
     private void wrapperFunction(String filename){
         int i=0;
         graphEdges = File2Edges.getEdgesFromFile(dataFileName);
-        //seeding my adjacency matrix for testing purposes
+     /*   //seeding my adjacency matrix for testing purposes
         Edge edge1 = new Edge("House E","House I", 2);
         Edge edge2 = new Edge("House J","House G", 2);
         Edge edge3 = new Edge("x","y", 300);
@@ -48,7 +48,7 @@ public class Mst{
         listEdges2.add(edge4);
         listEdges2.add(edge5);
         adjacencyList.add(listEdges);
-        adjacencyList.add(listEdges2);
+        adjacencyList.add(listEdges2);*/
 
         int size = graphEdges.size();
 
@@ -59,6 +59,7 @@ public class Mst{
             System.out.println(smallestEdge.toString());
             //is this smallest Edge in the adjacenyMatrix?
             System.out.println(isEdgeinAjList(smallestEdge,adjacencyList));
+            addToAdjacencyList(smallestEdge,adjacencyList);
             i++;
         }
 
@@ -66,14 +67,10 @@ public class Mst{
         String list = listToString(graphEdges);
         System.out.println(list);
 
-
-
-
-        String adjList = listListtoString(adjacencyList);
-        System.out.println(adjList);
+        printAdjList(adjacencyList);
     }
 
-    public static void printAdjacenyList( List<List<Edge>> AjList){
+    public static void printAdjList( List<List<Edge>> AjList){
         for (List<Edge> edgeList : AjList){
             for (Edge edge : edgeList){
                 System.out.print(edge + " ");
@@ -92,24 +89,16 @@ public class Mst{
             adjacencyList.add(list);
             return true;
         }
-
         for( List<Edge> innerList : adjacencyList){
-            if (innerList.get(count).start() == smallestEdge.start()) {
-                list = adjacencyList.get(count);
-                System.out.println(list);
-                list.add(smallestEdge);
-                adjacencyList.remove(count);
-                adjacencyList.add(list);
+            if (innerList.get(0).start().equals(smallestEdge.start())) {
+                adjacencyList.get(count).add(smallestEdge);
                 count++;
                 break;
             }
-
         }
         list.add(smallestEdge);
         adjacencyList.add(list);
-
         return true;
-
     }
 
     //find smallest node in the list of edges.
@@ -140,23 +129,21 @@ public class Mst{
         return false;
     }
 
-    public String listListtoString (List<List<Edge>> list) {
+    public void printAdjListToString (List<List<Edge>> list) {
         StringBuilder innerList= new StringBuilder();
-        StringBuilder fullList= new StringBuilder();
         for (List<Edge> edgeList : list) {
             for (Edge edge : edgeList){
-                innerList.append(edge.toString());
+                innerList.append(edge.toString() + ",");
             }
-            fullList.append(":").append(innerList);
+            System.out.println(innerList);
         }
-        return fullList.toString();
     }
 
     public String listToString(List<Edge> list){
-        String stringList ="";
+        StringBuilder stringList = new StringBuilder();
         for ( Edge edge : list ) {
-            stringList = stringList + edge.toString() + "/n";
+            stringList.append(stringList).append(edge.toString()).append("/n");
         }
-        return stringList;
+        return stringList.toString();
     }
 }
