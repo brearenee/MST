@@ -1,13 +1,13 @@
 package msu.edu;
-        import msu.edu.graphinput.*;
-        import java.util.List;
-        import java.util.LinkedList;
-        import java.io.File;
-        import java.io.IOException;
-        import java.io.FileWriter;
-        import java.util.Set;
-        import java.util.TreeSet;
-        import java.util.ArrayList;
+import msu.edu.graphinput.*;
+import java.util.List;
+import java.util.LinkedList;
+import java.io.File;
+import java.io.IOException;
+import java.io.FileWriter;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.ArrayList;
 
 
 public class Mst{
@@ -57,7 +57,7 @@ public class Mst{
         while (i < size){
             Edge smallestEdge = findSmallestEdge();
             System.out.println(smallestEdge.toString());
-        //is this smallest Edge in the adjacenyMatrix?
+            //is this smallest Edge in the adjacenyMatrix?
             System.out.println(isEdgeinAjList(smallestEdge,adjacencyList));
             i++;
         }
