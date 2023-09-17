@@ -3,6 +3,44 @@ import graphinput.Edge;
 import graphinput.File2Edges;
 import java.util.List;
 import java.util.ArrayList;
+public class Mst {
+    static final String DEF_FILE_NAME = "town.txt";
+    private final String dataFileName;
+    public static void main(String[] args) {
+        Mst mst;
+        if (args.length == 1) {
+            mst = new Mst(args[0]);
+        } else {
+            mst = new Mst(DEF_FILE_NAME);
+        }
+    }
+    public Mst(String filename) {
+        dataFileName = filename;
+    }
+
+    public Mst() {
+        this(DEF_FILE_NAME);
+    }
+
+    private void getMst(String filename){
+
+    }
+
+
+
+
+
+
+}
+
+
+
+
+/*
+import graphinput.Edge;
+import graphinput.File2Edges;
+import java.util.List;
+import java.util.ArrayList;
 
 
 public class Mst {
@@ -43,6 +81,7 @@ public class Mst {
         setUpAdjList();
 
         int size = graphEdges.size();
+
         System.out.println("new sorted list ");
         for (Edge edge : sortedEdges) {
             System.out.println(edge.toString());
@@ -151,4 +190,4 @@ public class Mst {
 
 
 }
-
+*/
