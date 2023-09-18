@@ -36,6 +36,8 @@ public class Mst {
             Integer value = entry.getValue();
             System.out.println("Key: " + key + ", Value: " + value);
         }
+
+
         adjList = createMST(sortedEdges, nodeKey);
         System.out.println("Adjacency List:");
         for (int i = 0; i < adjList.size(); i++) {
@@ -93,15 +95,62 @@ public class Mst {
         }
         return keyMap;
     }
+    //helped function to tell if two edges share any nodes
+    private static boolean doNodesCreateCycle (Edge edge1, Edge edge2){
+        if (edge1.start().equals(edge2.start()) || edge1.start().equals(edge2.end()) ||
+                edge1.end().equals(edge2.start()) || edge1.end().equals(edge2.end())) {
+            System.out.println("Cycle Created.");
+            System.out.println("should NOT have been added. ");
+            return true;
+        }
+        else return false;
+    }
 
+    public static boolean createsIndirectCycle(Edge edge1, TreeMap<String, Integer> nodeIndex, ArrayList<LinkedList<Edge>> adjList) {
+        // Perform a DFS to check if adding (u, v) creates an indirect cycle
+        boolean[] visited = new boolean[adjList.size()];
+        java.util.Stack<Integer> stack = new java.util.Stack<>();
+
+        // Start DFS from vertex u
+        int edge1Index = nodeIndex.get(edge1.start());
+        stack.push(edge1Index);
+
+        while (!stack.isEmpty()) {
+            int current = stack.pop();
+            visited[current] = true;
+
+            for (Edge edge : adjList.get(current)) {
+                int start = nodeIndex.get(edge.start());
+                int end = nodeIndex.get(edge.end());
+
+                int neighbor = (nodeIndex.get(edge.start()) == current) ? nodeIndex.get(edge.end()) : nodeIndex.get(edge.start());
+
+                if (!visited[neighbor]) {
+                    stack.push(neighbor);
+                } else if (neighbor != nodeIndex.get(edge1.start())) {
+                    // If the neighbor is visited and not the source vertex, then it's an indirect cycle
+                    return true;
+                }
+
+
+            }
+
+
+        }return false;
+    }
 
     private static ArrayList<LinkedList<Edge>> createMST(List<Edge> sortedList, TreeMap<String, Integer> nodeKey) {
         int size = sortedList.size();
         int listSize = nodeKey.size();
         ArrayList<LinkedList<Edge>> adjList = new ArrayList<>(listSize);
+        int sIndex;
+        int eIndex;
+        boolean createsCycle = false;
+        TreeSet<String> visitedNodes = new TreeSet<>();
         LinkedList<Edge> list1;
         LinkedList<Edge> list2;
-        Edge revEdg;
+        String start;
+        String end;
 
         //initialize LinkedLists inside Adjacency List.
         for (int i = 0; i < listSize; i++) {
@@ -109,58 +158,57 @@ public class Mst {
             adjList.add(innerList);
         }
 
-        int sIndex;
-        int eIndex;
-        boolean createsCycle = false;
+
+        //creates direct cycle?
+
+
 
 
         for (Edge node : sortedList) {
-            System.out.println("Sorted Node: " + node);
-            // Edge revEdge = new Edge(node.end(), node.start(), node.weight());
-            sIndex = nodeKey.get(node.start());
-            eIndex = nodeKey.get(node.end());
+            System.out.println("Starting Edge: " + node);
+            start = node.start();
+            end = node.end();
+            list1 = adjList.get(nodeKey.get(start));
+            list2 = adjList.get(nodeKey.get(end));
 
-            list1 = adjList.get(sIndex);
-            list2 = adjList.get(eIndex);
-
-            if (list1.isEmpty() || list2.isEmpty()) {
-                System.out.println("lists empty");
-                adjList.get(sIndex).add(node);
-                adjList.get(eIndex).add(node);
-                System.out.println("ADDED: " + adjList.get(sIndex));
-                System.out.println("ADDED: " + adjList.get(eIndex));
-                createsCycle = true;
-
+            //if lists are empty, no cycles.
+            if (list1.isEmpty() || list2.isEmpty()){
+                System.out.println("Empty List, so Adding Node to both lists. : ");
+                adjList.get(nodeKey.get(start)).add(node);
+                adjList.get(nodeKey.get(end)).add(node);
+                createsCycle=true;
             }
-            else {
-                for (Edge edge : list1) {
-                    for (Edge edge2 : list2) {
-                        if (edge.start().equals(edge2.start()) || edge.start().equals(edge2.end()) ||
-                                edge.end().equals(edge2.start()) || edge.end().equals(edge2.end())) {
-                            System.out.println("do I ever reach this inside loop?");
-                            //System.out.println(node);
-                            //System.out.println(edge);
-                           // System.out.println(edge2);
-
-                            createsCycle = true;
-                        }
-
+            //check for direct cycles
+            if (!createsCycle) {
+                for (Edge node1 : list1) {
+                    for (Edge node2 : list2) {
+                        System.out.println("checking for direct Cycles: ");
+                        createsCycle = doNodesCreateCycle(node1, node2);
+                        System.out.println(createsCycle);
                     }
                 }
             }
-            if (!createsCycle)
-            {
-                System.out.println("Adding at index");
-                adjList.get(sIndex).add(node);
-                adjList.get(eIndex).add(node);
-                System.out.println("ADDING TO BOTH INDEXS:" + node);
+            //check for indirect Cycles.
+            if (!createsCycle){
+                System.out.println("checking for indirect Cycles: ");
+                createsCycle = createsIndirectCycle(node,nodeKey,adjList);
+                System.out.println(createsCycle);
             }
+            //if no cycles exist, add to adj list.
+            if (!createsCycle){
+                System.out.println("No cycles, so adding: ");
+                adjList.get(nodeKey.get(start)).add(node);
+                adjList.get(nodeKey.get(end)).add(node);
+            }
+
             createsCycle = false;
-            //containsEdge2 = false;
+
+
         }
+
+
+
+
         return adjList;
-    }//end function
-
-
-
+    }//endfunction
 }//end class
