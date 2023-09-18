@@ -22,18 +22,26 @@ public class Mst {
     private static void getMst(String filename) {
         List<Edge> graphEdges = File2Edges.getEdgesFromFile(filename);
         List<Edge> sortedEdges = new ArrayList<>();
+        ArrayList<LinkedList<Edge>> adjList = new ArrayList<>();
         sortedEdges = getSortedEdges(graphEdges);
         System.out.println("sorted Edges: ");
-        for (Edge edge: sortedEdges){
+        for (Edge edge : sortedEdges) {
             System.out.println(edge.toString());
         }
         TreeMap<String, Integer> nodeKey = createNodeKey(sortedEdges);
-        System.out.println("new nodeKey:" );
+        System.out.println("new nodeKey:");
 
         for (Map.Entry<String, Integer> entry : nodeKey.entrySet()) {
             String key = entry.getKey();
             Integer value = entry.getValue();
             System.out.println("Key: " + key + ", Value: " + value);
+        }
+        adjList = createMST(sortedEdges, nodeKey);
+        System.out.println("Adjacency List:");
+        for (int i = 0; i < adjList.size(); i++) {
+            LinkedList<Edge> linkedList = adjList.get(i);
+
+            System.out.println("Linked List " + i + ": " + linkedList);
         }
     }
 
@@ -60,21 +68,21 @@ public class Mst {
     }
 
 
-    private static TreeMap<String, Integer> createNodeKey (List<Edge> sortedList){
+    private static TreeMap<String, Integer> createNodeKey(List<Edge> sortedList) {
         TreeMap<String, Integer> keyMap = new TreeMap<>();
         String node;
         int count = 0;
         Integer duplicate;
 
-        for (Edge edge : sortedList){
+        for (Edge edge : sortedList) {
             node = edge.start();
             if (!keyMap.containsKey(node)) {
-                keyMap.put(node,count++);
+                keyMap.put(node, count++);
 
             }
             node = edge.end();
             if (!keyMap.containsKey(node)) {
-                keyMap.put(node,count++);
+                keyMap.put(node, count++);
             }
         }
         //I wanted node A:0 , B:1, C:2 just for my own sake, so I'm reordering
@@ -83,165 +91,76 @@ public class Mst {
             String key = entry.getKey();
             keyMap.put(key, count++);
         }
-
         return keyMap;
     }
-}
 
 
+    private static ArrayList<LinkedList<Edge>> createMST(List<Edge> sortedList, TreeMap<String, Integer> nodeKey) {
+        int size = sortedList.size();
+        int listSize = nodeKey.size();
+        ArrayList<LinkedList<Edge>> adjList = new ArrayList<>(listSize);
+        LinkedList<Edge> list1;
+        LinkedList<Edge> list2;
+        Edge revEdg;
 
-/*
-import graphinput.Edge;
-import graphinput.File2Edges;
-import java.util.List;
-import java.util.ArrayList;
-
-
-public class Mst {
-    static final String DEF_FILE_NAME = "town.txt";
-    private final String dataFileName;
-    private List<Edge> graphEdges;
-    private final List<List<Edge>> adjacencyList = new ArrayList<>();
-    private List<Edge> sortedEdges = new ArrayList<>();
-    private List<Edge> visitedEdges = new ArrayList<>();
-
-    public static void main(String[] args) {
-        List<List<Edge>> mstList;
-        Mst mst;
-
-        if (args.length == 1) {
-            mst = new Mst(args[0]);
-        } else {
-            mst = new Mst(DEF_FILE_NAME);
+        //initialize LinkedLists inside Adjacency List.
+        for (int i = 0; i < listSize; i++) {
+            LinkedList<Edge> innerList = new LinkedList<>();
+            adjList.add(innerList);
         }
-        mstList = mst.getMST();
-        printAdjList(mstList);
-        // System.out.println(getTotalCost(mstList));
 
-    }
-
-    public Mst(String filename) {
-        dataFileName = filename;
-    }
-
-    public Mst() {
-        this(DEF_FILE_NAME);
-    }
-
-    private List<List<Edge>> getMST() {
-        int i = 0;
-        graphEdges = File2Edges.getEdgesFromFile(dataFileName);
-        getSortedEdges(graphEdges);
-        setUpAdjList();
-
-        int size = graphEdges.size();
-
-        System.out.println("new sorted list ");
-        for (Edge edge : sortedEdges) {
-            System.out.println(edge.toString());
-            System.out.println(isEdgeInAjList(edge));
-        }
-        System.out.println("adjacency list with reverse stuff  ");
+        int sIndex;
+        int eIndex;
+        boolean createsCycle = false;
 
 
-        return adjacencyList;
-    }
+        for (Edge node : sortedList) {
+            System.out.println("Sorted Node: " + node);
+            // Edge revEdge = new Edge(node.end(), node.start(), node.weight());
+            sIndex = nodeKey.get(node.start());
+            eIndex = nodeKey.get(node.end());
 
-    //takes in GraphEdges and adds each node to the ADJ list.  Since the graph is unweighted, both orders are added.
-    private void setUpAdjList() {
-        List<Edge> tempList;
-        List<Edge> reverseList;
-        Edge reverseEdge;
-        for (Edge edge : sortedEdges) {
-            tempList = new ArrayList<>();
-            tempList.add(edge);
-            adjacencyList.add(tempList);
+            list1 = adjList.get(sIndex);
+            list2 = adjList.get(eIndex);
 
-            //add reverse edge to adjacency list because of unweighted graph
-            reverseList = new ArrayList<>();
-            reverseEdge = new Edge(edge.end(), edge.start(), edge.weight());
-            reverseList.add(reverseEdge);
-            adjacencyList.add(reverseList);
-        }
-    }
+            if (list1.isEmpty() || list2.isEmpty()) {
+                System.out.println("lists empty");
+                adjList.get(sIndex).add(node);
+                adjList.get(eIndex).add(node);
+                System.out.println("ADDED: " + adjList.get(sIndex));
+                System.out.println("ADDED: " + adjList.get(eIndex));
+                createsCycle = true;
 
-    private void getSortedEdges(List<Edge> unsortedList) {
-        int i = 0;
-        while (i < graphEdges.size()) {
-            Edge smallestEdge = findSmallestEdge();
-            sortedEdges.add(smallestEdge);
-        }
-        i++;
-    }
-
-
-    private Edge findSmallestEdge() {
-        Edge smallest = graphEdges.get(0);
-        for (Edge edge : graphEdges) {
-            if (edge.weight() < smallest.weight()) {
-                smallest = edge;
             }
-        }
-        graphEdges.remove(smallest);
-        return smallest;
-    }
+            else {
+                for (Edge edge : list1) {
+                    for (Edge edge2 : list2) {
+                        if (edge.start().equals(edge2.start()) || edge.start().equals(edge2.end()) ||
+                                edge.end().equals(edge2.start()) || edge.end().equals(edge2.end())) {
+                            System.out.println("do I ever reach this inside loop?");
+                            //System.out.println(node);
+                            //System.out.println(edge);
+                           // System.out.println(edge2);
 
+                            createsCycle = true;
+                        }
 
-    public static void printAdjList(List<List<Edge>> AjList) {
-        for (List<Edge> edgeList : AjList) {
-            for (Edge edge : edgeList) {
-                System.out.println(edge);
+                    }
+                }
             }
-        }
-    }
-
-
-    private boolean addToAdjacencyList(Edge smallestEdge) {
-        List<Edge> list = new ArrayList<>();
-        int count = 0;
-
-
-        if (adjacencyList.isEmpty()) {
-            list.add(smallestEdge);
-            adjacencyList.add(list);
-            return true;
-        }
-
-        for (List<Edge> innerList : adjacencyList) {
-            if (innerList.get(0).start().equals(smallestEdge.start())) {
-                adjacencyList.get(count).add(smallestEdge);
-                return true;
-            } else count++;
-        }
-
-        list.add(smallestEdge);
-        adjacencyList.add(list);
-        return true;
-    }
-
-
-
-    private boolean isEdgeInAjList(Edge edge ) {
-        Edge reverseEdge = new Edge(edge.end(), edge.start(), edge.weight());
-        Boolean counter=false;
-        for (Edge node : visitedEdges) {
-            if (node.equals(edge) || node.equals(reverseEdge)) {
-                return true;
+            if (!createsCycle)
+            {
+                System.out.println("Adding at index");
+                adjList.get(sIndex).add(node);
+                adjList.get(eIndex).add(node);
+                System.out.println("ADDING TO BOTH INDEXS:" + node);
             }
+            createsCycle = false;
+            //containsEdge2 = false;
         }
-        return false;
-    }
-
-    public static int getTotalCost(List<List<Edge>> mstList){
-        int sum=0;
-        for (List<Edge> innerList: mstList){
-            for( Edge edge : innerList){
-                sum+=edge.weight();
-            }
-        }
-        return sum;
-    }
+        return adjList;
+    }//end function
 
 
-}
-*/
+
+}//end class
