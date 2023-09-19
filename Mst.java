@@ -21,24 +21,14 @@ public class Mst {
 
     private static void getMst(String filename) {
         List<Edge> graphEdges = File2Edges.getEdgesFromFile(filename);
-        List<Edge> sortedEdges = new ArrayList<>();
         ArrayList<LinkedList<Edge>> adjList = new ArrayList<>();
-        sortedEdges = getSortedEdges(graphEdges);
-        TreeMap<String, Integer> nodeKey = createNodeKey(sortedEdges);
         Set<Edge> mst = new HashSet<>();
-        adjList = createAdjList(sortedEdges, nodeKey);
 
-        for (List<Edge> list : adjList) {
-            for (Edge edge : list) {
-                System.out.print(edge + " ");
-            }
-            System.out.println( " ");
-        }
+        List<Edge> sortedEdges = getSortedEdges(graphEdges);
+        TreeMap<String, Integer> nodeKey = createNodeKey(sortedEdges);
+
+        adjList = createAdjList(sortedEdges, nodeKey);
         mst = mst(adjList);
-        System.out.println( " mst");
-            for (Edge edge : mst) {
-                System.out.println(edge + " ");
-            }
 
         for (Edge edge : mst){
             System.out.println(edge.toString());
@@ -46,8 +36,6 @@ public class Mst {
 
         int sum = sum(mst);
         System.out.println(sum);
-
-
     }
 
     private static List<Edge> getSortedEdges(List<Edge> unsortedList) {
@@ -97,16 +85,16 @@ public class Mst {
         }
         return keyMap;
     }
-    //helped function to tell if two edges share any nodes
 
-    public static boolean createsIndirectCycle(Edge edge1, TreeMap<String, Integer> nodeIndex, ArrayList<LinkedList<Edge>> adjList) {
-
-        //while I was able to catch direct cycles, I was having a very hard time implementing indirect cycles so I used
-        //ChatGPT to help me. I still had to move things around, but this is my conversation. https://chat.openai.com/c/73ec904b-d607-4a10-8e5c-aedaf803457f
+    public static boolean createsCycle(Edge edge1, TreeMap<String, Integer> nodeIndex, ArrayList<LinkedList<Edge>> adjList) {
+        /*
+        While I was able to catch direct cycles, I was having a very hard time implementing indirect cycles so I used
+        ChatGPT to help me. I still had to move things around, and run through the algorithm on paper to make sure I understood it,
+        but this is my conversation. https://chat.openai.com/c/73ec904b-d607-4a10-8e5c-aedaf803457f
+        */
 
         boolean[] visited = new boolean[adjList.size()];
         java.util.Stack<Integer> stack = new java.util.Stack<>();
-
 
         int edge1Index = nodeIndex.get(edge1.start());
         stack.push(edge1Index);
@@ -127,24 +115,20 @@ public class Mst {
                     // If the neighbor is visited and not the source vertex, then it's an indirect cycle
                     return true;
                 }
-
-
             }
-
-
         }return false;
     }
 
     private static ArrayList<LinkedList<Edge>> createAdjList(List<Edge> sortedList, TreeMap<String, Integer> nodeKey) {
-        int size = sortedList.size();
         int listSize = nodeKey.size();
         ArrayList<LinkedList<Edge>> adjList = new ArrayList<>(listSize);
-        int sIndex;
-        int eIndex;
-        boolean createsCycle = false;
         TreeSet<String> visitedNodes = new TreeSet<>();
         LinkedList<Edge> list1;
         LinkedList<Edge> list2;
+
+        int sIndex;
+        int eIndex;
+        boolean createsCycle = false;
         String start;
         String end;
 
@@ -169,7 +153,7 @@ public class Mst {
 
             //check for Cycles.
             if (!createsCycle){
-                createsCycle = createsIndirectCycle(node,nodeKey,adjList);
+                createsCycle = createsCycle(node,nodeKey,adjList);
             }
             //if no cycles exist, add to adj list.
             if (!createsCycle){
@@ -192,11 +176,9 @@ public class Mst {
 
     private static Set<Edge> mst (ArrayList<LinkedList<Edge>> adjList){
         Set<Edge> mst = new HashSet<>();
-
         for (List<Edge> edges : adjList) {
             mst.addAll(edges);
         }
-
         return mst;
     }
 
