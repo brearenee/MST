@@ -112,7 +112,6 @@ public class Mst {
                 if (!visited[neighbor]) {
                     stack.push(neighbor);
                 } else if (neighbor != nodeIndex.get(edge1.start())) {
-                    // If the neighbor is visited and not the source vertex, then it's an indirect cycle
                     return true;
                 }
             }
@@ -165,7 +164,7 @@ public class Mst {
         return adjList;
     }//endfunction
 
-    private static int sum ( Set<Edge> mst){
+    private static int sum (Set<Edge> mst){
         int sum=0;
         for (Edge edge: mst){
             int weight = edge.weight;
