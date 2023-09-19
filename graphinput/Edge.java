@@ -31,6 +31,4 @@ public class Edge <Edge>{
         + this.endNode + ", "
         + this.weight;
     }
-//@author Brea Chaney. Needed to create a TreeSet of Edges, so i'm overwriting the comparable class.
-
 }
