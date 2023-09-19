@@ -9,7 +9,7 @@ package graphinput;
  * @version Fall 2023 (2)
  * @author Dr. Jody Paul
  */
-public class Edge {
+public class Edge <Edge>{
     public String startNode;
     public String endNode;
     public int weight;
@@ -31,6 +31,6 @@ public class Edge {
         + this.endNode + ", "
         + this.weight;
     }
-
+//@author Brea Chaney. Needed to create a TreeSet of Edges, so i'm overwriting the comparable class.
 
 }

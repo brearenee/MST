@@ -24,27 +24,30 @@ public class Mst {
         List<Edge> sortedEdges = new ArrayList<>();
         ArrayList<LinkedList<Edge>> adjList = new ArrayList<>();
         sortedEdges = getSortedEdges(graphEdges);
-        System.out.println("sorted Edges: ");
-        for (Edge edge : sortedEdges) {
+        TreeMap<String, Integer> nodeKey = createNodeKey(sortedEdges);
+        Set<Edge> mst = new HashSet<>();
+        adjList = createAdjList(sortedEdges, nodeKey);
+
+        for (List<Edge> list : adjList) {
+            for (Edge edge : list) {
+                System.out.print(edge + " ");
+            }
+            System.out.println( " ");
+        }
+        mst = mst(adjList);
+        System.out.println( " mst");
+            for (Edge edge : mst) {
+                System.out.println(edge + " ");
+            }
+
+        for (Edge edge : mst){
             System.out.println(edge.toString());
         }
-        TreeMap<String, Integer> nodeKey = createNodeKey(sortedEdges);
-        System.out.println("new nodeKey:");
 
-        for (Map.Entry<String, Integer> entry : nodeKey.entrySet()) {
-            String key = entry.getKey();
-            Integer value = entry.getValue();
-            System.out.println("Key: " + key + ", Value: " + value);
-        }
+        int sum = sum(mst);
+        System.out.println(sum);
 
 
-        adjList = createMST(sortedEdges, nodeKey);
-        System.out.println("Adjacency List:");
-        for (int i = 0; i < adjList.size(); i++) {
-            LinkedList<Edge> linkedList = adjList.get(i);
-
-            System.out.println("Linked List " + i + ": " + linkedList);
-        }
     }
 
     private static List<Edge> getSortedEdges(List<Edge> unsortedList) {
@@ -68,7 +71,6 @@ public class Mst {
         }
         return sortedEdges;
     }
-
 
     private static TreeMap<String, Integer> createNodeKey(List<Edge> sortedList) {
         TreeMap<String, Integer> keyMap = new TreeMap<>();
@@ -96,22 +98,16 @@ public class Mst {
         return keyMap;
     }
     //helped function to tell if two edges share any nodes
-    private static boolean doNodesCreateCycle (Edge edge1, Edge edge2){
-        if (edge1.start().equals(edge2.start()) || edge1.start().equals(edge2.end()) ||
-                edge1.end().equals(edge2.start()) || edge1.end().equals(edge2.end())) {
-            System.out.println("Cycle Created.");
-            System.out.println("should NOT have been added. ");
-            return true;
-        }
-        else return false;
-    }
 
     public static boolean createsIndirectCycle(Edge edge1, TreeMap<String, Integer> nodeIndex, ArrayList<LinkedList<Edge>> adjList) {
-        // Perform a DFS to check if adding (u, v) creates an indirect cycle
+
+        //while I was able to catch direct cycles, I was having a very hard time implementing indirect cycles so I used
+        //ChatGPT to help me. I still had to move things around, but this is my conversation. https://chat.openai.com/c/73ec904b-d607-4a10-8e5c-aedaf803457f
+
         boolean[] visited = new boolean[adjList.size()];
         java.util.Stack<Integer> stack = new java.util.Stack<>();
 
-        // Start DFS from vertex u
+
         int edge1Index = nodeIndex.get(edge1.start());
         stack.push(edge1Index);
 
@@ -139,7 +135,7 @@ public class Mst {
         }return false;
     }
 
-    private static ArrayList<LinkedList<Edge>> createMST(List<Edge> sortedList, TreeMap<String, Integer> nodeKey) {
+    private static ArrayList<LinkedList<Edge>> createAdjList(List<Edge> sortedList, TreeMap<String, Integer> nodeKey) {
         int size = sortedList.size();
         int listSize = nodeKey.size();
         ArrayList<LinkedList<Edge>> adjList = new ArrayList<>(listSize);
@@ -158,14 +154,7 @@ public class Mst {
             adjList.add(innerList);
         }
 
-
-        //creates direct cycle?
-
-
-
-
         for (Edge node : sortedList) {
-            System.out.println("Starting Edge: " + node);
             start = node.start();
             end = node.end();
             list1 = adjList.get(nodeKey.get(start));
@@ -173,42 +162,42 @@ public class Mst {
 
             //if lists are empty, no cycles.
             if (list1.isEmpty() || list2.isEmpty()){
-                System.out.println("Empty List, so Adding Node to both lists. : ");
                 adjList.get(nodeKey.get(start)).add(node);
                 adjList.get(nodeKey.get(end)).add(node);
                 createsCycle=true;
             }
-            //check for direct cycles
-            if (!createsCycle) {
-                for (Edge node1 : list1) {
-                    for (Edge node2 : list2) {
-                        System.out.println("checking for direct Cycles: ");
-                        createsCycle = doNodesCreateCycle(node1, node2);
-                        System.out.println(createsCycle);
-                    }
-                }
-            }
-            //check for indirect Cycles.
+
+            //check for Cycles.
             if (!createsCycle){
-                System.out.println("checking for indirect Cycles: ");
                 createsCycle = createsIndirectCycle(node,nodeKey,adjList);
-                System.out.println(createsCycle);
             }
             //if no cycles exist, add to adj list.
             if (!createsCycle){
-                System.out.println("No cycles, so adding: ");
                 adjList.get(nodeKey.get(start)).add(node);
                 adjList.get(nodeKey.get(end)).add(node);
             }
-
             createsCycle = false;
-
-
         }
-
-
-
-
         return adjList;
     }//endfunction
+
+    private static int sum ( Set<Edge> mst){
+        int sum=0;
+        for (Edge edge: mst){
+            int weight = edge.weight;
+                sum += edge.weight();
+        }
+        return sum;
+    }
+
+    private static Set<Edge> mst (ArrayList<LinkedList<Edge>> adjList){
+        Set<Edge> mst = new HashSet<>();
+
+        for (List<Edge> edges : adjList) {
+            mst.addAll(edges);
+        }
+
+        return mst;
+    }
+
 }//end class
