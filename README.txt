@@ -1,4 +1,4 @@
-Given a text file with edgeName, distance - calculate the minimum spanning tree 
+Given a text file with edgeName, distance (town.txt) - calculate the minimum spanning tree/ smallest distance to reach all points. 
 
 to run:
 
